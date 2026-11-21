@@ -1,6 +1,11 @@
 
+from pathlib import Path
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
+from django.http import HttpResponse
+from django.conf import settings
+
 from .models import Task
 
 
@@ -50,7 +55,6 @@ def home(request):
         'completed_tasks': completed_tasks,
         'pending_tasks': pending_tasks,
         'completion_percentage': round(completion_percentage, 2),
-
         'monthly_total': monthly_total,
         'monthly_completed': monthly_completed,
         'monthly_pending': monthly_pending,
@@ -80,3 +84,22 @@ def complete_task(request, task_id):
             task.save()
 
     return redirect('home')
+
+
+# PWA Service Worker
+def service_worker(request):
+    file_path = (
+        Path(settings.BASE_DIR)
+        / "todo"
+        / "static"
+        / "todo"
+        / "service-worker.js"
+    )
+
+    javascript = file_path.read_text(encoding="utf-8")
+
+    return HttpResponse(
+        javascript,
+        content_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/"}
+    )
