@@ -1,13 +1,14 @@
+
 import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
- = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 
 if not SECRET_KEY:
     raise ValueError("DJANGO_SECRET_KEY is not set")
-SECRET_KEY
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
