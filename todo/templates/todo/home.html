@@ -1,52 +1,219 @@
+
 {% load static %}
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>My Todo App</title>
+    <title>Todo Analytics Dashboard</title>
+
     <link rel="stylesheet" href="{% static 'todo/style.css' %}">
+
+    <style>
+        .analytics {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .analytics-card {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .analytics-card h2 {
+            margin: 5px;
+            color: #333;
+        }
+
+        .analytics-card p {
+            margin: 5px;
+            font-weight: bold;
+        }
+
+        .task-date {
+            font-size: 12px;
+            color: gray;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            background: #ddd;
+            border-radius: 20px;
+            height: 18px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            background: #28a745;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        .monthly-section {
+            margin-top: 35px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+    </style>
 </head>
+
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>My Todo List 📝</h1>
+    <h1>My Todo List 📝</h1>
 
-        <form method="POST">
-            {% csrf_token %}
-            <input type="text" name="title" placeholder="Enter your task" required>
-            <button type="submit">Add Task</button>
-        </form>
+    <!-- Overall Analytics -->
 
-        <h2>My Tasks</h2>
+    <h2>Task Analytics Dashboard 📊</h2>
 
-        {% for task in tasks %}
-            <div class="task">
+    <div class="analytics">
 
-                <span>{{ task.title }}</span>
+        <div class="analytics-card">
+            <h2>{{ total_tasks }}</h2>
+            <p>Total Tasks</p>
+        </div>
 
-                {% if task.completed %}
-                    <span class="completed">✔ Completed</span>
-                {% else %}
-                    <span>Pending</span>
+        <div class="analytics-card">
+            <h2>{{ completed_tasks }}</h2>
+            <p>Completed Tasks</p>
+        </div>
 
-                    <form method="POST" action="{% url 'complete_task' task.id %}">
-                        {% csrf_token %}
-                        <button type="submit">Complete</button>
-                    </form>
-                {% endif %}
+        <div class="analytics-card">
+            <h2>{{ pending_tasks }}</h2>
+            <p>Pending Tasks</p>
+        </div>
 
-                <form method="POST" action="{% url 'delete_task' task.id %}">
-                    {% csrf_token %}
-                    <button type="submit">Delete</button>
-                </form>
-
-            </div>
-        {% empty %}
-            <p>No tasks available.</p>
-        {% endfor %}
+        <div class="analytics-card">
+            <h2>{{ completion_percentage }}%</h2>
+            <p>Completion Rate</p>
+        </div>
 
     </div>
+
+    <!-- Overall Progress -->
+
+    <h3>Task Completion Progress</h3>
+
+    <div class="progress-container">
+        <div class="progress-bar"
+             style="width: {{ completion_percentage }}%;">
+        </div>
+    </div>
+
+    <!-- Monthly Productivity Report -->
+
+    <div class="monthly-section">
+
+        <h2>Monthly Productivity Report 📅</h2>
+
+        <h3>{{ month_name }}</h3>
+
+        <div class="analytics">
+
+            <div class="analytics-card">
+                <h2>{{ monthly_total }}</h2>
+                <p>Monthly Total Tasks</p>
+            </div>
+
+            <div class="analytics-card">
+                <h2>{{ monthly_completed }}</h2>
+                <p>Monthly Completed</p>
+            </div>
+
+            <div class="analytics-card">
+                <h2>{{ monthly_pending }}</h2>
+                <p>Monthly Pending</p>
+            </div>
+
+            <div class="analytics-card">
+                <h2>{{ monthly_percentage }}%</h2>
+                <p>Monthly Completion Rate</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Add New Task -->
+
+    <h2>Add New Task</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input type="text"
+               name="title"
+               placeholder="Enter your task"
+               required>
+
+        <button type="submit">Add Task</button>
+    </form>
+
+    <!-- Task List -->
+
+    <h2>My Tasks</h2>
+
+    {% for task in tasks %}
+
+        <div class="task">
+
+            <span>{{ task.title }}</span>
+
+            <span class="task-date">
+                Created: {{ task.created_at|date:"d M Y" }}
+            </span>
+
+            {% if task.completed %}
+
+                <span class="completed">✔ Completed</span>
+
+                <span class="task-date">
+                    Completed:
+                    {{ task.completed_at|date:"d M Y H:i" }}
+                </span>
+
+            {% else %}
+
+                <span>Pending</span>
+
+                <form method="POST"
+                      action="{% url 'complete_task' task.id %}">
+
+                    {% csrf_token %}
+
+                    <button type="submit">Complete</button>
+
+                </form>
+
+            {% endif %}
+
+            <form method="POST"
+                  action="{% url 'delete_task' task.id %}">
+
+                {% csrf_token %}
+
+                <button type="submit">Delete</button>
+
+            </form>
+
+        </div>
+
+    {% empty %}
+
+        <p>No tasks available.</p>
+
+    {% endfor %}
+
+</div>
 
 </body>
 </html>
