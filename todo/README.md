@@ -95,3 +95,4 @@ python manage.py test
 
 ## Author
 Gayatri Ghadge
+DevOps CI/CD Pipeline - Automated Build Enabled.
