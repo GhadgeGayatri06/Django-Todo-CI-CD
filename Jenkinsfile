@@ -1,8 +1,5 @@
 pipeline {
     agent any
-       environment {
-    DJANGO_SECRET_KEY = credentials('django-secret-key')
-}
 
     environment {
         DJANGO_SECRET_KEY = credentials('django-secret-key')
